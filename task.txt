@@ -1,0 +1,118 @@
+Tavsif
+Ishlab chiqarish korxonasida mahsulot ishlab chiqarish uchun kerak bo’ladigan xomashyolar haqida (omborxonada yetarlicha xomashyo bormi, qancha miqdorda bor, qancha yetmayapti, qaysi partiyadan qancha miqdorda olinyapti) ma’lumot olish uchun omborxonaga so’rov yuborish. Mahsulot ishlab chiqarish uchun ishlatilinadigan xomashyolar oldindan kiritilgan bo’ladi.
+Obyektlar:
+1) Mahsulot – ishlab chiqariladigan mahsulotlar. Quyidagi ma’lumotlardan tashkil topadi:
+- mahsulot nomi - mahsulot kodi
+2) Xomashyo – mahsulot ishlab chiqarish uchun foydalaniladigan xomashyolar bo’lib quyidagi ma’lumotlardan tashkil topadi:
+- xomashyo nomi
+3) Mahsulot-Xomashyo (product-materials - yordamchi jadval) – qaysi mahsulotni ishlab chiqarish uchun qanday mahsulotlar ishlatilinishini ko’rsatadi. Ushbu yordamchi jadval quyidagilardan iborat:
+- product_id – mahsulot “id” si;
+- material_id – xomashyo “id” si;
+- quantity – foydalaniladigan xomashyolar soni.
+Masalan: 1 dona Ko’ylak ishlab chiqarish uchun: a) 0.8 metr kvadrat mato;
+b) 5 ta tugma;
+c) 10 metr ip ketadi.
+1 dona Shim ishlab chiqarish uchun: a) 1.4 metr kvadrat mato;
+b) 15 metr ip;
+c) 1 ta zamok ketadi.
+4) Omborxona (warehouses) – partiya bo’lib kelgan xomashyolar jamlanmasi. Bir xomashyo bir necha marta partiya bo’lib omborxonaga kelgan bo’lishi mumkin. Ushbu obyekt quyidagilardan iborat:
+- material_id – xomashyo;
+- remainder – ushbu partiyadan nechta xomashyo qolganini ko’rsatadi;
+- price – ushbu partiyada kelgan mahsulot qanday narxda kelganini ko’rsatadi.
+!!! Hamma jadvallar ma’lumotlari “database” dan qo’lda kiritilinadi.
+Asosiy vazifa 2 xil mahsulot ishlab chiqarishim kerak:
+1) Ko’ylakdan 30 ta; 2) Shimdan 20 ta.
+Shunda omborxonadan olishim kerak bo’lgan xomashyolarim quyidagicha: 30 ta ko’ylak ishlab chiqarish uchun:
+a) Mato – 24 m2;
+
+b) Tugma – 150 ta; c) Ip – 300 m;
+20 ta shim ishlab chiqarish uchun: a) Mato – 28 m2;
+b) Ip – 300 m;
+c) Zamok – 20 ta.
+Omborxonada bor xomashyolar partiya boyicha quyidagicha:
+  No     Xomashyo nomi 1.     Mato
+2.     Mato
+3.     Ip
+4.     Ip
+5.     Tugma 6.     Zamok
+Qoldiq Narx 12 1500 200 1600 40 500 300 550 500 300 1000 2000
+                Omborxonaga yuborgan so’rovimning javobida quyidagi ma’lumot kelishi kerak:
+{
+  "result": [
+    {
+      "product_name": "Ko'ylak",
+      "product_qty": "30",
+      "product_materials": [
+        {
+          "warehouse_id": 1,
+          "material_name": "Mato",
+          "qty": 24,
+          "price": 1500
+        },
+        {
+          "warehouse_id": 5,
+          "material_name": "Tugma",
+          "qty": 150,
+          "price": 300
+        },
+        {
+          "warehouse_id": 3,
+          "material_name": "Ip",
+          "qty": 40,
+          "price": 500
+        },
+        {
+          "warehouse_id": 4,
+          "material_name": "Ip",
+          "qty": 260,
+          "price": 550
+        }
+      ]
+    },
+    {
+      "product_name": "Shim",
+      "product_qty": "20",
+      "product_materials": [
+        {
+          "warehouse_id": 1,
+          "material_name": "Mato",
+          "qty": 2,
+          "price": 1500
+        },
+        {
+          "warehouse_id": 2,
+          "material_name": "Mato",
+          "qty": 26,
+          "price": 1600
+        },
+        {
+          "warehouse_id": 4,
+          "material_name": "Ip",
+          "qty": 40,
+          "price": 550
+        },
+        {
+          "warehouse_id": null,
+          "material_name": "Ip",
+          "qty": 260,
+          "price": null
+        },
+        {
+          "warehouse_id": 6,
+          "material_name": "Zamok",
+          "qty": 20,
+          "price": 1000
+        }
+      ]
+    }
+  ]
+}
+!!!MUHIM. Agar bir xil xomashyoni bir nechta mahsulot so’ragan bo’lsa avvalgi mahsulotlar olgan partiya va sonlarni (yani band qilganlarini) tashlab ketib hisoblash kerak. Lekin bu yerda bazadagi ma’lumotga hech qanday o’zgartirish kiritish kerak emas (yani olingan sonni “remainder” dan ayiribqoyish kerak emas).
+Masalan tepadigi misolda ikkinchi mahsulot (Shim) uchun “Mato” xomashyosi birinchi partiyadanmas ikkinchi partiyadan olmoqda. Chunki birinchi partiyani hammasi birinchi mahsulot (Ko’ylak) uchun olinib bo’lindi. “Ip” xomashyosi esa 4-partiyadan qolgan sonidan ya’ni 40 tani olmoqda. Lekin bizga 300 ta kerak edi. Qolgan 260 tasi omborxonada yo’qligi sababli "warehouse_id": null va "price": null ko’rinishida qaytarilmoqda.
+Bu ma’lumotlarni olayotganda “warehouses” jadvaliga hech qanday o’zgartirish kiritilmaydi.
+Ishlatilishi kerak: Django, Postgres(Mysql), Postman(response olish uchun). Quyidagi fikrlarga alohida e'tibor qaratish lozim:
+"warehouse_id": 6, "material_name": "Zamok", "qty": 20,
+"price": 2000
+
+• Kod chunarli va tartibli yozilishi kerak, tabulyatsiya va boshqa yozma elementlarga rioya qilish, test topshirig'ining funktsionalligi bilan bog'liq bo'lmagan keraksiz elementlar va funktsiyalarsiz, tushunarli izohlar bilan ta'minlangan bp’lishi kerak.
+* Oson oqiladigan va elementar arxitekturaning ega bo’lishi kerak. Muddat: 3 kun.
